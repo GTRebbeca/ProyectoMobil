@@ -1,0 +1,276 @@
+
+<html>
+	{{ 
+        include(
+            "header.mdli", 
+            {
+                title: "Página de inicio", 
+                dominio : dom 
+            }
+        ) 
+    }} 
+	<body>
+        <div id="jqxLoader"></div>
+        <div id="ownerPanel" style="width: 100%; height: 100%;">
+            {{ include("headerbody.mdli") }}
+            {{ include("sidebar.mdli") }}
+
+            <div id="content" style="padding: 10px;">
+                
+                <div style='float: left;' id='jqxTabs'>
+
+                    <ul style="margin-left: 30px;">
+
+                        {% for step in stepsformalities %}
+                            <li>{{ step.Name }}</li>
+                        {% endfor %}
+
+                    </ul>
+                    
+                    {% for step in stepsformalities %}
+                        <div align="center">
+
+                            {% if loop.last %}
+                                <form action="http://{{actionForm}}" method="get" id="form3">
+                            {% else %}
+                                <form method="get" >
+                            {% endif %}
+
+                                <input type="hidden" id="tramiteId" name="tramiteId" value="{{tramiteId}}" />
+                                <input type="hidden" id="ownerId" name="ownerId" value="{{ userInfoId }}" />
+                                <input type="hidden" id="ownerType" name="ownerType" value="{{ ownerType }}" />
+                                <input type="hidden" id="origin" name="origin" value="formStep" />
+
+                                <table width="80%" style="font-size: 11px;">
+                                    {% for dstep in step.datasteps %}
+                                        {% if dstep.Tipo_de_Dato__c == 'Texto' %}
+                                            
+                                            <tr style="height: 35px;">
+                                                <td align="right">
+                                                    <b>{{dstep.Name}}: </b>
+                                                </td>
+                                                <td>
+                                                    {% if dstep.Obligatorio__c == 'true' %}
+                                                        <font size="3" color="red">*</font>
+                                                    {% else %}
+                                                        &nbsp;
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <input type="text" name="{{dstep.Id}}" id="{{dstep.Id}}" required="{{dstep.Obligatorio__c}}" value="{{dstep.Tipo_Texto__c}}" />
+                                                </td>
+                                            </tr>
+
+                                        {% elseif dstep.Tipo_de_Dato__c == 'Lista de Selección' %}
+
+                                            <tr style="height: 35px;">
+                                                <td align="right">
+                                                    <b>{{dstep.Name}}: </b>
+                                                </td>
+                                                <td align="right">
+                                                    {% if dstep.Obligatorio__c == 'true' %}
+                                                        <font size="3" color="red">*</font>
+                                                    {% else %}
+                                                        &nbsp;
+                                                    {% endif %}
+                                                </td>
+                                                <td align="left">
+                                                    <select name="{{dstep.Id}}" id="{{dstep.Id}}" required="{{dstep.Obligatorio__c}}">
+                                                        {% for option in dstep.Tipo_Lista_de_Seleccion__c %}
+                                                            <option value="{{option}}">{{option}}</option>
+                                                        {% endfor %}
+                                                    </select>  
+                                                </td>
+                                            </tr>
+
+                                        {% elseif dstep.Tipo_de_Dato__c == 'Número' %}
+
+                                            <tr style="height: 35px;">
+                                                <td align="right">
+                                                    <b>{{dstep.Name}}: </b>
+                                                </td>
+                                                <td align="right">
+                                                    {% if dstep.Obligatorio__c == 'true' %}
+                                                        <font size="3" color="red">*</font>
+                                                    {% else %}
+                                                        &nbsp;
+                                                    {% endif %}
+                                                </td>
+                                                <td align="left">
+                                                    <input type="number" name="{{dstep.Id}}" id="{{dstep.Id}}" value="{{dstep.Tipo_Numero__c}}" required="{{dstep.Obligatorio__c}}"/>
+                                                </td>
+                                            </tr>
+
+                                        {% elseif dstep.Tipo_de_Dato__c == 'Fecha' %}
+
+                                            <tr style="height: 35px;">
+                                                <td align="right">
+                                                    <b>{{dstep.Name}}: </b>
+                                                </td>
+                                                <td align="right">
+                                                    {% if dstep.Obligatorio__c == 'true' %}
+                                                        <font size="3" color="red">*</font>
+                                                    {% else %}
+                                                        &nbsp;
+                                                    {% endif %}
+                                                </td>
+                                                <td align="left">
+                                                    <input type="date" name="{{dstep.Id}}" id="{{dstep.Id}}" value="{{dstep.Tipo_Fecha__c}}" required="{{dstep.Obligatorio__c}}"/>
+                                                </td>
+                                            </tr>
+
+                                        {% elseif dstep.Tipo_de_Dato__c == 'Casilla' %}
+
+                                            <tr style="height: 35px;">
+                                                <td align="right">
+                                                    <b>{{dstep.Name}}: </b>
+                                                </td>
+                                                <td align="right">
+                                                    {% if dstep.Obligatorio__c == 'true' %}
+                                                        <font size="3" color="red">*</font>
+                                                    {% else %}
+                                                        &nbsp;
+                                                    {% endif %}
+                                                </td>
+                                                <td align="left">
+                                                    {% if dstep.Tipo_Casilla__c == 'true' %}
+                                                        <input type="checkbox" name="{{dstep.Id}}" id="{{dstep.Id}}" checked="on" required="{{dstep.Obligatorio__c}}"/>
+                                                    {% elseif dstep.Tipo_Casilla__c == 'false' %}
+                                                        <input type="checkbox" name="{{dstep.Id}}" id="{{dstep.Id}}" required="{{dstep.Obligatorio__c}}"/>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+
+                                        {% elseif dstep.Tipo_de_Dato__c == 'Área de texto largo' %}
+
+                                            <tr style="height: 35px;">
+                                                <td align="right">
+                                                    <b>{{dstep.Name}}: </b>
+                                                </td>
+                                                <td align="right">
+                                                    {% if dstep.Obligatorio__c == 'true' %}
+                                                        <font size="3" color="red">*</font>
+                                                    {% else %}
+                                                        &nbsp;
+                                                    {% endif %}
+                                                </td>
+                                                <td align="left">
+                                                    <textarea name="{{dstep.Id}}" id="{{dstep.Id}}" required="{{dstep.Obligatorio__c}}" cols="6">{{dstep.Area_de_texto_largo__c}}</textarea>
+                                                </td>
+                                            </tr>
+
+                                        {% elseif dstep.Tipo_de_Dato__c == 'Archivo' %}
+
+                                            <tr style="height: 35px;">
+                                                <td align="right">
+                                                    <b>{{dstep.Name}}: </b>
+                                                </td>
+                                                <td align="right">
+                                                    {% if dstep.Obligatorio__c == 'true' %}
+                                                        <font size="3" color="red">*</font>
+                                                    {% else %}
+                                                        &nbsp;
+                                                    {% endif %}
+                                                </td>
+                                                <td align="left">
+                                                    <input type="file" name="{{dstep.Id}}" id="{{dstep.Id}}" value="{{dstep.Tipo_Archivo__c}}" required="{{dstep.Obligatorio__c}}"/>
+                                                </td>
+                                            </tr>
+
+                                        {% endif %}
+                                    {% endfor %}
+                                </table>
+                                <br/>
+                                <br/>
+                                {% if loop.last %}
+                                    {% for button in buttons %}
+                                        {% if button != null %}
+                                            <!-- stepNumber -->
+                                            <input type="hidden" id="goStep" name="goStep" value="{{button.stepNumber}}_{{button.Label}}_approved" />
+                                            <input type="button" onclick="sendform{{loop.index}}();" value="{{ button.Label }}">
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+
+                            </form>
+                        </div>
+                    {% endfor %}
+
+                </div>
+            </div>  
+        </div>
+
+        <!-- Se generan los formularios para cada botón -->
+
+        {% for button in buttons %}
+            {% if loop.index == 1 %}
+                <form  action="http://{{actionForm}}" method="get"  id="form{{loop.index}}">
+                    <input type="hidden" id="tramiteId" name="tramiteId" value="{{tramiteId}}" />
+                    <input type="hidden" id="ownerId" name="ownerId" value="{{ userInfoId }}" />
+                    <input type="hidden" id="ownerType" name="ownerType" value="{{ ownerType }}" />
+                    <input type="hidden" id="origin" name="origin" value="formStep" />
+                    <input type="hidden" id="goStep" name="goStep" value="{{button.stepNumber}}_{{button.Label}}_cancel" />
+                </form>
+            {% elseif loop.index == 2 %}
+                <form  action="http://{{actionForm}}" method="get"  id="form{{loop.index}}">
+                    <input type="hidden" id="tramiteId" name="tramiteId" value="{{tramiteId}}" />
+                    <input type="hidden" id="ownerId" name="ownerId" value="{{ userInfoId }}" />
+                    <input type="hidden" id="ownerType" name="ownerType" value="{{ ownerType }}" />
+                    <input type="hidden" id="origin" name="origin" value="formStep" />
+                    <input type="hidden" id="goStep" name="goStep" value="{{button.stepNumber}}_{{button.Label}}_other" />
+                </form>
+            {% endif %}
+        {% endfor %}
+
+
+        <!-- Se generan los Submit de cada botón porque están fuera de los formularios -->
+
+        {% for button in buttons %}
+            <script type="text/javascript">
+                function sendform{{loop.index}}() {
+                    document.getElementById('form{{loop.index}}').submit();
+                }
+            </script>
+        {% endfor %}
+
+
+
+        <script type="text/javascript">
+            
+            $(document).ready(function () {
+
+                $('#content').jqxPanel();
+                $('#content').jqxPanel(
+                    { 
+                        width: '78.1%', 
+                        height: '95%' 
+                    }
+                );
+
+                 $('#jqxTabs').jqxTabs(
+                    { 
+                        width: '99%',
+                        scrollPosition: 'both',
+                        theme: 'abilia'
+                    }
+                );
+                 $('#jqxTabs').jqxTabs('select', 1);
+
+                if($('textarea').length != 0)
+                    $('textarea').jqxTextArea({ height: 90, width: 300, minLength: 1, });
+                
+                if($('input[type="button"]').length != 0)
+                    $("input[type='button']").jqxButton({theme: 'abilia', width: '200', height: '30'});
+                
+                if($('input[type="text"]').length != 0)
+                    $("input[type='text']").addClass('jqx-input-abilia');
+
+                if($('input[type="number"]').length != 0)
+                    $("input[type='number']").addClass('jqx-input-abilia');
+
+                
+                
+            });
+        </script>
+	</body>
+</html>
